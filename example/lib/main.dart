@@ -4,11 +4,7 @@ import 'package:auth0_flutter_web/auth0_flutter_web.dart';
 late Auth0 auth0;
 
 void main() async {
-  auth0 = await createAuth0Client(
-    Auth0ClientOptions(
-    )
-  );
-
+  auth0 = await createAuth0Client(Auth0ClientOptions(domain: "sre-university.us.auth0.com", client_id: "HF74gbE80jobdpAaGXPCvVPlTSzI6stU"));
   runApp(MyApp());
 }
 
@@ -44,20 +40,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    auth0.isAuthenticated()
-      .then(_onAuthenticationChanged);
+    auth0.isAuthenticated().then(_onAuthenticationChanged);
   }
 
-  void _onAuthenticationChanged(bool isAuthenticated){
-    if(!isAuthenticated){
+  void _onAuthenticationChanged(bool isAuthenticated) {
+    if (!isAuthenticated) {
       setState(() => _loggedIn = false);
     } else {
-      auth0.getUser()
-        .then((Map<String, dynamic>? user) => setState((){
+      auth0.getTokenSilently(options: GetTokenSilentlyOptions(audience: "http://localhost:6060")).then((String token) => {print("access token: $token")});
+      auth0.getUser().then((Map<String, dynamic>? user) => setState(() {
             _loggedIn = true;
             _name = user!["name"];
             _avatarUrl = user["picture"];
-          })); 
+          }));
     }
   }
 
@@ -71,25 +66,27 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _loggedIn ? 
-              Column(
-                children:[
-                  Image.network(_avatarUrl!),
-                  Text(_name!),
-                  ElevatedButton(
-                    child: Text('Logout'),
+            _loggedIn
+                ? Column(children: [
+                    // Image.network(_avatarUrl!),
+                    Text(_name!),
+                    ElevatedButton(
+                      child: Text('Logout'),
+                      onPressed: () async {
+                        // auth0.logout(options: LogoutOptions(localOnly: true));
+                        auth0.logout();
+                        auth0.isAuthenticated().then((value) => setState(() => _loggedIn = value));
+                      },
+                    )
+                  ])
+                : ElevatedButton(
+                    child: Text('Login'),
                     onPressed: () async {
-                      auth0.logout();
-
-                      auth0.isAuthenticated()
-                        .then((value) => setState(() => _loggedIn = value));
-                    },)
-                ]
-              ):
-              ElevatedButton(child: Text('Login'),onPressed: () async {
-                await auth0.loginWithPopup(options: PopupLoginOptions(scope: "email"));
-                _onAuthenticationChanged(await auth0.isAuthenticated());
-              },),
+                      await auth0.loginWithPopup(options: PopupLoginOptions(scope: "email"));
+                      // await auth0.loginWithPopup(options: PopupLoginOptions(scope: "email"));
+                      _onAuthenticationChanged(await auth0.isAuthenticated());
+                    },
+                  ),
           ],
         ),
       ),
