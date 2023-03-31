@@ -52,7 +52,7 @@ class Auth0ClientOptions extends BaseLoginOptions {
   external String get domain;
   external String get issuer;
   external String get client_id;
-  external String get redirect_url;
+  external String get redirect_uri;
   external num get leeway;
   external Object get cacheLocation;
   external bool get useRefreshTokens;
@@ -78,7 +78,7 @@ class Auth0ClientOptions extends BaseLoginOptions {
     @required String domain,
     String issuer,
     @required String client_id,
-    String redirect_url,
+    String redirect_uri,
     num leeway,
     Object cacheLocation,
     bool useRefreshTokens,
@@ -128,7 +128,7 @@ class RedirectLoginOptions extends BaseLoginOptions {
     String acr_values,
     String scope,
     String audience,
-    String redirect_url,
+    String redirect_uri,
     String? connection,
     String? organization,
     String? invitation,
@@ -140,16 +140,7 @@ class RedirectLoginOptions extends BaseLoginOptions {
 @anonymous
 class GetTokenWithPopupOptions extends PopupLoginOptions {
   external factory GetTokenWithPopupOptions(
-      {String display,
-      String prompt,
-      Object max_age,
-      String ui_locales,
-      String id_token_hint,
-      String login_hint,
-      String acr_values,
-      String scope,
-      String audience,
-      String? connection});
+      {String display, String prompt, Object max_age, String ui_locales, String id_token_hint, String login_hint, String acr_values, String scope, String audience, String? connection});
 }
 
 @JS()
